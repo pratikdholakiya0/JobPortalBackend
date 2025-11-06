@@ -14,7 +14,7 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("https://job-portal-front-end-nine.vercel.app", "http://localhost:5173")); // Frontend origin
+        config.setAllowedOrigins(List.of("https://job-portal-front-end-nine.vercel.app")); // Frontend origin
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // If using cookies / sessions
