@@ -1,11 +1,12 @@
 version: '3.8'
+
 services:
   spring-app:
-    build: . # Or specify the path to your Dockerfile context
+    build: .
     ports:
       - "8080:8080"
     environment:
-      # Pass the Atlas URI securely as an environment variable
-      # The variable name maps to a Spring Boot configuration property
-      SPRING_DATA_MONGODB_URI: "mongodb+srv://dholakiya225:Goku@cluster0.ux3lohb.mongodb.net/?appName=Cluster0"
-      SPRING_DATA_MONGODB_DATABASE: "job_portal"
+      SPRING_DATA_MONGODB_URI: ${MONGODB_ATLAS_URI}
+      JWT_SECRET: ${JWT_SECRET}
+    env_file:
+      - .env
