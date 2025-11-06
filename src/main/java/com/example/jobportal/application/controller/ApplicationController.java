@@ -7,7 +7,6 @@ import com.example.jobportal.application.entity.ApplicationActivity;
 import com.example.jobportal.application.service.ApplicationService;
 import com.example.jobportal.auth.service.JobPortalUserPrincipal;
 import com.example.jobportal.user.dto.ResponseMessage;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -20,8 +19,11 @@ import java.util.List;
 @RequestMapping("/api/v1/applications")
 public class ApplicationController {
 
-    @Autowired
-    private ApplicationService applicationService;
+    private final ApplicationService applicationService;
+
+    public ApplicationController(ApplicationService applicationService) {
+        this.applicationService = applicationService;
+    }
 
     @PostMapping("/submit")
     public ResponseEntity<ResponseMessage> submitApplication(
@@ -40,11 +42,23 @@ public class ApplicationController {
 
     @GetMapping("/my-applications")
     public ResponseEntity<List<Application>> getCandidateApplications(
-            @AuthenticationPrincipal JobPortalUserPrincipal principal) {
+            @AuthenticationPrincipal JobPortalUserPrincipal principal,
+            @RequestParam(value = "page", defaultValue = "0", required = false) int page,
+            @RequestParam(value = "size", defaultValue = "5", required = false) int size) {
         if (principal == null) throw new AccessDeniedException("Authentication required to view applications.");
 
-        List<Application> applications = applicationService.getApplicationsByCandidate(principal);
+        List<Application> applications = applicationService.getApplicationsByCandidate(principal, page, size);
         return ResponseEntity.ok(applications);
+    }
+
+    @GetMapping("/getById/{id}")
+    public ResponseEntity<Application> getCandidateApplications(
+            @AuthenticationPrincipal JobPortalUserPrincipal principal,
+            @PathVariable("id") String id) {
+        if (principal == null) throw new AccessDeniedException("Authentication required to view applications.");
+
+        Application application = applicationService.getApplicationById(id);
+        return ResponseEntity.ok(application);
     }
 
     @GetMapping("/by-employer")

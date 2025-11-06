@@ -1,7 +1,7 @@
 package com.example.jobportal.application.repository;
 
 import com.example.jobportal.application.entity.Application;
-import com.example.jobportal.job.entity.JobPosting;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,9 +15,9 @@ public interface ApplicationRepository extends MongoRepository<Application, Stri
 
     Application findApplicationById(String id);
 
-    Application getApplicationsByUserIdAndJobPostingId(String userId, String jobPostingId);
-
-    List<Application> getApplicationsByUserId(String userId);
+    List<Application> getApplicationsByUserId(String userId, Pageable pageable);
 
     Application getApplicationsById(String id);
+
+    Application findApplicationByUserIdAndJobId(String userId, String jobId);
 }

@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Skill {
-    // No @Id needed as it's embedded
     @NotBlank
     private String name;
     private String proficiencyLevel;

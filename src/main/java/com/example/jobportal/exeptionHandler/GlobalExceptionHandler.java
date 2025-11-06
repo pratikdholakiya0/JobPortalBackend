@@ -22,6 +22,35 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(JobPostNotFound.class)
+    public ResponseEntity<ErrorMessage> jobPostNotFoundException(JobPostNotFound e) {
+        ErrorMessage errorMessage = ErrorMessage.builder()
+                .message(e.getMessage())
+                .status(HttpStatus.NOT_FOUND)
+                .timestamp(new Date(System.currentTimeMillis())).build();
+        return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(UserAlreadyExist.class)
+    public ResponseEntity<ErrorMessage> userAlreadyExist(UserAlreadyExist e) {
+        ErrorMessage errorMessage = ErrorMessage.builder()
+                .message(e.getMessage())
+                .status(HttpStatus.CONFLICT)
+                .timestamp(new Date(System.currentTimeMillis()))
+                .build();
+        return new ResponseEntity<>(errorMessage, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorMessage> illegalArgumentException(IllegalArgumentException e) {
+
+        ErrorMessage errorMessage = ErrorMessage.builder()
+                .message(e.getMessage())
+                .status(HttpStatus.BAD_REQUEST)
+                .timestamp(new Date(System.currentTimeMillis())).build();
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(CandidateProfileNotCreated.class)
     public ResponseEntity<ErrorMessage> candidateProfileNotCreatedException(CandidateProfileNotCreated e) {
         ErrorMessage errorMessage = ErrorMessage.builder()
@@ -41,9 +70,15 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
     }
 
+
     @ExceptionHandler(InvalidCredentials.class)
-    public ResponseEntity<String> handleInvalidCredentials(InvalidCredentials ex){
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<ErrorMessage> handleInvalidCredentials(InvalidCredentials e){
+        ErrorMessage errorMessage = ErrorMessage.builder()
+                .message(e.getMessage())
+                .status(HttpStatus.NOT_FOUND)
+                .timestamp(new Date(System.currentTimeMillis()))
+                .build();
+        return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(CompanyNotFound.class)

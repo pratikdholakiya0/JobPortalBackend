@@ -29,7 +29,7 @@ public class CompanyService {
         String companyId = principal.getCompanyId();
         if(companyId!=null) throw new CompanyAlreadyRegisterByUser("Employer already has a registered company profile. Only one company is allowed per user.");
         company.setUserId(userId);
-        Company companySaved = companyRepository.save(company);
+        companyRepository.save(company);
     }
 
     public Company getCompany(String id){
@@ -39,7 +39,6 @@ public class CompanyService {
     }
 
     public Company getCompanyByUser(JobPortalUserPrincipal principal){
-        String userId = principal.getUserId();
         String companyId = principal.getCompanyId();
         if (companyId == null) throw new CompanyNotFound("User does not have a company profile");
         return companyRepository.findCompanyById(companyId);
@@ -56,8 +55,10 @@ public class CompanyService {
         if (company.getName() != null && !company.getName().isEmpty()) companyDb.setName(company.getName());
         if (company.getDescription() != null && !company.getDescription().isEmpty()) companyDb.setDescription(company.getDescription());
         if (company.getIndustry() != null && !company.getIndustry().isEmpty()) companyDb.setIndustry(company.getIndustry());
+        if (company.getSize()!= null && !company.getSize().isEmpty()) companyDb.setSize(company.getSize());
+        if (company.getAddress()!= null && !company.getAddress().isEmpty()) companyDb.setAddress(company.getAddress());
         if (company.getWebsite() != null && !company.getWebsite().isEmpty()) companyDb.setWebsite(company.getWebsite());
-        if (company.getHeadquartersLocation()!=null && !company.getHeadquartersLocation().isEmpty()) companyDb.setHeadquartersLocation(company.getHeadquartersLocation());
+        if (company.getHeadquarters()!=null && !company.getHeadquarters().isEmpty()) companyDb.setHeadquarters(company.getHeadquarters());
         if (company.getLogoFileUrl()!=null && !company.getLogoFileUrl().isEmpty()) companyDb.setLogoFileUrl(company.getLogoFileUrl());
 
         companyRepository.save(companyDb);

@@ -12,5 +12,6 @@ public class ProfileRequest {
     private String lastName;
     private String phoneNumber;
     private String location;
+    private String jobTitle;
     private String bio;
 }

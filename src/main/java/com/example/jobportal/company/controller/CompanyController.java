@@ -53,7 +53,7 @@ public class CompanyController {
         return ResponseEntity.ok(company);
     }
 
-    @GetMapping("/getCompany")
+    @GetMapping("/get")
     public ResponseEntity<Company> getCompany(@AuthenticationPrincipal JobPortalUserPrincipal principal){
 
         if (principal == null) {

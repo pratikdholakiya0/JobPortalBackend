@@ -31,7 +31,7 @@ public class ResumeService {
 
     public Resume updateResume(Resume resume, JobPortalUserPrincipal principal) {
         String userId = principal.getUserId();
-        String resumeId = resume.getId();
+        String resumeId = principal.getResumeId();
 
         if (resumeId == null) throw new CandidateProfileNotCreated("Candidate profile is not created yet of user : "+ userId);
 
@@ -40,6 +40,10 @@ public class ResumeService {
         if (resume.getEducationList() != null) resumeEntity.setEducationList(resume.getEducationList());
         if (resume.getSkillList() != null) resumeEntity.setSkillList(resume.getSkillList());
         if (resume.getExperienceList() != null) resumeEntity.setExperienceList(resume.getExperienceList());
+        if (resume.getGithub() != null) resumeEntity.setGithub(resume.getGithub());
+        if (resume.getTwitter() != null) resumeEntity.setTwitter(resume.getTwitter());
+        if (resume.getLinkedin() != null) resumeEntity.setLinkedin(resume.getLinkedin());
+        if (resume.getPortfolio() != null) resumeEntity.setPortfolio(resume.getPortfolio());
 
         return resumeRepository.save(resumeEntity);
     }

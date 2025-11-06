@@ -25,5 +25,6 @@ public class Profile {
     private String email;
     private String phoneNumber;
     private String location;
+    private String jobTitle;
     private String bio;
 }

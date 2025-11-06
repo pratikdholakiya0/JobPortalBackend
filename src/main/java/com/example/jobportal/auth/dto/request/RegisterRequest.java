@@ -1,6 +1,7 @@
 package com.example.jobportal.auth.dto.request;
 
 import com.example.jobportal.user.enums.Role;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -11,11 +12,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "education")
 public class RegisterRequest {
+    @Email
+    @NotBlank
     private String email;
 
-    @NotBlank(message = "Password is required")
+    @NotNull(message = "Password is required")
     private String password;
 
     @NotNull(message = "User role is required")
