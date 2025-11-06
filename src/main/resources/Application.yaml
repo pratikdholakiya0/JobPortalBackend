@@ -2,4 +2,5 @@ spring:
   data:
     mongodb:
       uri: ${MONGODB_URI}
+      database: ${DB_NAME}
       auto-index-creation: true
