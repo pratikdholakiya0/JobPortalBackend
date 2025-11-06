@@ -8,4 +8,4 @@ services:
       # Pass the Atlas URI securely as an environment variable
       # The variable name maps to a Spring Boot configuration property
       SPRING_DATA_MONGODB_URI: ${MONGO_URI}
-      SPRING_DATA_MONGODB_DATABASE: ${MONGO_DB}
+      SPRING_DATA_MONGODB_DATABASE: ${DATABASE_NAME}
