@@ -28,7 +28,8 @@ public class Application {
     private String companyId;
     @NotBlank
     @Indexed(unique = true)
-    private String jobPostingId;
+    private String jobId;
+    private String jobTitle;
 
     private Date applicationDate;
     private ApplicationStatus status;

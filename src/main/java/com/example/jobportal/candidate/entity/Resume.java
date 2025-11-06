@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -25,7 +26,10 @@ public class Resume {
     private String bio;
     private List<Education> educationList;
     private List<Experience> experienceList;
-    private List<Skill> skillList;
-    private String resumeUrl;
+    private List<String> skillList;
+    private String github;
+    private String twitter;
+    private String linkedin;
+    private String portfolio;
     private boolean isSearchable;
 }

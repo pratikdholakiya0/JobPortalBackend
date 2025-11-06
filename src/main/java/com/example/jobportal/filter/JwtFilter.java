@@ -51,7 +51,11 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
+            boolean userExist = userRepository.getUserByEmail(username)!=null;
+            if (!userExist) {
+                filterChain.doFilter(request, response);
+                return;
+            }
             if (jwtutil.isValid(token)) {
 
                 Claims claims = jwtutil.extractAllClaims(token);
@@ -68,25 +72,10 @@ public class JwtFilter extends OncePerRequestFilter {
                 String profileId = claims.get("profileId", String.class);
                 String resumeId = claims.get("resumeId", String.class);
                 String companyId = claims.get("companyId", String.class);
+                String name = claims.get("name", String.class);
                 Role role = Role.valueOf(roleString);
 
-                // === START ROBUST ON-DEMAND REFRESH LOGIC ===
-                boolean requiresRefresh = false;
-                if ((role.equals(Role.APPLICANT) && resumeId == null) || (role.equals(Role.EMPLOYER) && companyId == null)) {
-                    requiresRefresh = true;
-                }
-
-                if (requiresRefresh) {
-                    // CRITICAL: Call generateClaims (returns Map<String, Object>) to get fresh data
-                    Map<String, Object> newClaimsMap = jwtutil.generateClaims(username);
-
-                    // Update local variables from the fresh Map for principal creation
-                    profileId = (String) newClaimsMap.get("profileId");
-                    resumeId = (String) newClaimsMap.get("resumeId");
-                    companyId = (String) newClaimsMap.get("companyId");
-                }
-                // === END ROBUST ON-DEMAND REFRESH LOGIC ===
-
+                boolean requiresRefresh = (role.equals(Role.APPLICANT) && resumeId == null) || (role.equals(Role.EMPLOYER) && companyId == null);
 
                 List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
 
@@ -97,9 +86,11 @@ public class JwtFilter extends OncePerRequestFilter {
                         resumeId,
                         companyId,
                         username,
+                        name,
                         null,
                         role,
-                        authorities
+                        authorities,
+                        requiresRefresh
                 );
 
                 // 3. Set Authentication Context

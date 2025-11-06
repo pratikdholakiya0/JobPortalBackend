@@ -1,6 +1,7 @@
 package com.example.jobportal.user.entity;
 
 import com.example.jobportal.user.enums.Role;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,8 +21,10 @@ public class User {
     @Id
     private String id;
     @Indexed(unique = true)
+    @NotNull
     private String email;
     private String password;
+    @NotNull
     private Role role;
     private boolean isActive;
     private Date creationDate;

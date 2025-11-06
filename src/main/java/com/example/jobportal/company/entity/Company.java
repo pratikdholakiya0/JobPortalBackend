@@ -25,9 +25,12 @@ public class Company {
     private String name;
 
     private String industry;
-    private String headquartersLocation;
+    private String headquarters;
+    private String size;
 
     private String description;
+    @NotBlank
+    private String address;
 
     private String website;
     private String logoFileUrl;

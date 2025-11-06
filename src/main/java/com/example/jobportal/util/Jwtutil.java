@@ -69,6 +69,7 @@ public class Jwtutil {
 
         Profile profile = profileRepository.getProfileByUserId(user.getId());
         claims.put("profileId", profile != null ? profile.getId() : null);
+        claims.put("name", profile!=null ? profile.getFirstName()+" "+profile.getLastName() : "");
 
         // Map candidateProfileId to resumeId claim
         Resume resume = resumeRepository.getResumeByUserId(user.getId());

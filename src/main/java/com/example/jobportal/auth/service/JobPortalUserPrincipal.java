@@ -3,10 +3,7 @@ package com.example.jobportal.auth.service;
 import com.example.jobportal.user.enums.Role;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -20,9 +17,11 @@ public class JobPortalUserPrincipal implements UserDetails {
     private final String resumeId;
     private final String companyId;
     private final String username;
+    private final String name;
     private final String password;
     private final Role role;
     private final Collection<? extends GrantedAuthority> authorities;
+    private final boolean requiresRefresh;
 
     public JobPortalUserPrincipal(
             String userId,
@@ -30,18 +29,22 @@ public class JobPortalUserPrincipal implements UserDetails {
             String resumeId,
             String companyId,
             String username,
+            String name,
             String password,
             Role role,
-            Collection<? extends GrantedAuthority> authorities
+            Collection<? extends GrantedAuthority> authorities,
+            boolean requiresRefresh
     ){
         this.userId = userId;
         this.profileId = profileId;
         this.resumeId = resumeId;
         this.companyId = companyId;
         this.username = username;
+        this.name = name;
         this.password = password;
         this.role = role;
         this.authorities = authorities;
+        this.requiresRefresh = requiresRefresh;
     }
 
     @Override

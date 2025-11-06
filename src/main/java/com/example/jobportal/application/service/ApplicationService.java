@@ -8,59 +8,54 @@ import com.example.jobportal.application.enums.ApplicationStatus;
 import com.example.jobportal.application.repository.ApplicationActivityRepository;
 import com.example.jobportal.application.repository.ApplicationRepository;
 import com.example.jobportal.auth.service.JobPortalUserPrincipal;
-import com.example.jobportal.candidate.repository.ResumeRepository;
-import com.example.jobportal.company.repository.CompanyRepository;
 import com.example.jobportal.exeptionHandler.customException.ApplicationAlreadySubmited;
 import com.example.jobportal.exeptionHandler.customException.ApplicationNotApplied;
 import com.example.jobportal.exeptionHandler.customException.CandidateProfileNotCreated;
 import com.example.jobportal.exeptionHandler.customException.JobPostNotFound;
 import com.example.jobportal.job.entity.JobPosting;
 import com.example.jobportal.job.repository.JobPostingRepository;
-import com.example.jobportal.job.service.JobPostingService;
+import com.example.jobportal.messaging.service.ConversationService;
 import com.example.jobportal.user.enums.Role;
-import com.example.jobportal.user.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 
 @Service
 public class ApplicationService {
-    @Autowired
-    private JobPostingService jobPostingService;
 
-    @Autowired
-    private ApplicationActivityRepository applicationActivityRepository;
+    private final ApplicationActivityRepository applicationActivityRepository;
+    private final ApplicationRepository applicationRepository;
+    private final JobPostingRepository jobPostingRepository;
+    private final ConversationService conversationService;
 
-    @Autowired
-    private ApplicationRepository applicationRepository;
+    public ApplicationService(ApplicationActivityRepository applicationActivityRepository, ApplicationRepository applicationRepository,
+                              JobPostingRepository jobPostingRepository, ConversationService conversationService) {
+        this.applicationActivityRepository = applicationActivityRepository;
+        this.applicationRepository = applicationRepository;
+        this.jobPostingRepository = jobPostingRepository;
+        this.conversationService = conversationService;
+    }
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private ResumeRepository resumeRepository;
-
-    @Autowired
-    private CompanyRepository companyRepository;
-
-    @Autowired
-    private JobPostingRepository jobPostingRepository;
-
-    public List<Application> getApplicationsByCandidate(JobPortalUserPrincipal principal) {
-        if (principal.getResumeId()==null) throw new CandidateProfileNotCreated("Candidate Profile Not Created yet. Please complete your resume profile.");
+    public List<Application> getApplicationsByCandidate(JobPortalUserPrincipal principal, int page, int size) {
+        String resumeId = principal.getResumeId();
+        if (resumeId==null) throw new CandidateProfileNotCreated("Candidate Profile Not Created yet. Please complete your resume profile.");
 
         String userId = principal.getUserId();
-        List<Application> applications = applicationRepository.getApplicationsByUserId(userId);
+        Sort sort = Sort.by(Sort.Direction.DESC, "applicationDate");
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        List<Application> applications = applicationRepository.getApplicationsByUserId(userId, pageable);
         if(applications == null || applications.isEmpty()) throw new ApplicationNotApplied("User have not applied to any application");
         return applications;
     }
 
+    @Transactional
     public void applyToJob(ApplicationSubmissionRequest  request, JobPortalUserPrincipal principal) {
         String userId = principal.getUserId();
         String resumeId = principal.getResumeId();
@@ -70,19 +65,22 @@ public class ApplicationService {
         JobPosting jobPosting = jobPostingRepository.findJobPostingById(request.getJobId());
         if (jobPosting == null) throw new JobPostNotFound("There is no job post with id : " + request.getJobId());
 
-        Application application = applicationRepository.getApplicationsByUserIdAndJobPostingId(userId, request.getJobId());
+        Application application = applicationRepository.findApplicationByUserIdAndJobId(userId, request.getJobId());
         if (application != null) throw new ApplicationAlreadySubmited("You have already applied to this job.");
 
         application = Application.builder()
                 .userId(userId)
                 .companyId(jobPosting.getCompanyId())
-                .jobPostingId(request.getJobId())
+                .jobId(request.getJobId())
+                .jobTitle(jobPosting.getTitle())
                 .coverLetterText(request.getCoverLetterText())
                 .applicationDate(new Date(System.currentTimeMillis()))
                 .status(ApplicationStatus.APPLIED)
                 .build();
 
         Application savedApplication = applicationRepository.save(application);
+
+        conversationService.createConversation(principal, application);
 
         logApplicationActivity(savedApplication.getId(), ApplicationStatus.APPLIED, Role.APPLICANT, "Application submitted successfully.");
     }
@@ -118,7 +116,7 @@ public class ApplicationService {
                 permissionGranted = true;
             }
         } else if (role.equals(Role.EMPLOYER)) {
-            if (employerCompanyId!=null && application.getCompanyId().equals(employerCompanyId)) {
+            if (application.getCompanyId().equals(employerCompanyId)) {
                 permissionGranted = true;
             }
         }
@@ -132,7 +130,6 @@ public class ApplicationService {
         applicationRepository.save(application);
         logApplicationActivity(applicationStatusUpdate.getApplicationId(), newStatus, Role.EMPLOYER,
                 String.format("Status changed from %s to %s.", oldStatus, newStatus.name()));
-
     }
 
     private void logApplicationActivity(String applicationId, ApplicationStatus status, Role changedBy, String note) {
@@ -144,5 +141,11 @@ public class ApplicationService {
                 .note(note)
                 .build();
         applicationActivityRepository.save(activity);
+    }
+
+    public Application getApplicationById(String applicationId) {
+        Application application = applicationRepository.findApplicationById(applicationId);
+        if (application == null) throw new ApplicationNotApplied("Application does not exist");
+        return application;
     }
 }
