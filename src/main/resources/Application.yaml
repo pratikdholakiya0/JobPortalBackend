@@ -1,6 +1,6 @@
 spring:
   data:
     mongodb:
-      uri: ${MONGODB_URI}
-      database: ${DB_NAME}
+#      uri: "mongodb+srv://dholakiya225:Goku@cluster0.ux3lohb.mongodb.net/?appName=Cluster0"
+#      database: "job_portal"
       auto-index-creation: true
