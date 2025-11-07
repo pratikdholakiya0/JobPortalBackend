@@ -1,9 +1,12 @@
-FROM maven:3.8.3-openjdk-17 AS build
-COPY . .
-RUN mvn clean install
+FROM maven:3.9.6-eclipse-temurin-17 AS builder
+WORKDIR /app
+COPY pom.xml .
+COPY src /app/src
+RUN mvn clean package -DskipTests
 
-FROM eclipse-temurin:17-jdk
-COPY --from=build /target/JobPortal-0.0.1-SNAPSHOT.jar demo.jar
-# ENV PORT=8080
+FROM eclipse-temurin:17-jre-jammy
+WORKDIR /app
+# Copy the JAR from the 'builder' stage
+COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","demo.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
