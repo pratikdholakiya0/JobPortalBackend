@@ -34,7 +34,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/chat")
-                .setAllowedOrigins("https://job-portal-front-end-nine.vercel.app")
+                .setAllowedOrigins("https://thejobstream.vercel.app", "http://localhost:5173")
                 .withSockJS();
 
         /*
