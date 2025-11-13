@@ -36,6 +36,7 @@ public class SecurityConfig {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req ->req
                         // --- 1. PUBLIC ACCESS (No token required) ---
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/company/getCompany/**").permitAll() // Public company view by ID
                         .requestMatchers(HttpMethod.GET, "/api/v1/jobs/getById/**").permitAll() // Public job view by ID
