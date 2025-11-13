@@ -27,6 +27,7 @@ docker-compose.yml
 /nbdist/
 /.nb-gradle/
 build/
+.env
 !**/src/main/**/build/
 !**/src/test/**/build/
 
